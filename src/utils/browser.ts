@@ -15,7 +15,15 @@ const DISABLE_ANIMATIONS_CSS = `
 `;
 
 export async function createBrowser(headless: boolean): Promise<Browser> {
-  const browser = await chromium.launch({ headless });
+  const browser = await chromium.launch({
+    headless,
+    channel: 'chrome',
+    args: [
+      '--disable-blink-features=AutomationControlled',
+      '--no-sandbox',
+      '--disable-setuid-sandbox',
+    ],
+  });
   return browser;
 }
 
@@ -29,6 +37,8 @@ export async function createPage(browser: Browser, timeout: number): Promise<Pag
   page.setDefaultNavigationTimeout(timeout);
 
   await page.addInitScript(() => {
+    // Hide webdriver flag
+    Object.defineProperty(navigator, 'webdriver', { get: () => false });
     // Disable smooth scrolling at the document level
     document.documentElement.style.scrollBehavior = 'auto';
   });

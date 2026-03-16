@@ -23,7 +23,7 @@ export async function detectComponents(page: Page): Promise<DetectedComponent[]>
       variantGroups: { selector: string; styles: Record<string, string> }[];
     }[] = [];
 
-    function getSelector(el: Element): string {
+    const getSelector = (el: Element): string => {
       if (el.id) return `#${el.id}`;
       const classes = Array.from(el.classList).filter(c => c.length > 0);
       if (classes.length > 0) {
@@ -31,9 +31,9 @@ export async function detectComponents(page: Page): Promise<DetectedComponent[]>
         return `${tag}.${classes.join('.')}`;
       }
       return el.tagName.toLowerCase();
-    }
+    };
 
-    function getKeyStyles(el: Element, props: string[]): Record<string, string> {
+    const getKeyStyles = (el: Element, props: string[]): Record<string, string> => {
       const cs = window.getComputedStyle(el);
       const out: Record<string, string> = {};
       for (const p of props) {
@@ -43,16 +43,16 @@ export async function detectComponents(page: Page): Promise<DetectedComponent[]>
         }
       }
       return out;
-    }
+    };
 
-    function trimHTML(el: Element): string {
+    const trimHTML = (el: Element): string => {
       return el.outerHTML.substring(0, 500);
-    }
+    };
 
-    function detectVariants(
+    const detectVariants = (
       elements: Element[],
       differProps: string[],
-    ): { selector: string; styles: Record<string, string> }[] {
+    ): { selector: string; styles: Record<string, string> }[] => {
       const groups = new Map<string, { selector: string; styles: Record<string, string>; count: number }>();
       for (const el of elements) {
         const cs = window.getComputedStyle(el);
@@ -71,14 +71,14 @@ export async function detectComponents(page: Page): Promise<DetectedComponent[]>
         selector: g.selector,
         styles: g.styles,
       }));
-    }
+    };
 
-    function addResult(
+    const addResult = (
       type: string,
       elements: Element[],
       styleProps: string[],
       variantProps: string[],
-    ) {
+    ) => {
       if (elements.length === 0) return;
       const first = elements[0];
       results.push({
@@ -89,7 +89,7 @@ export async function detectComponents(page: Page): Promise<DetectedComponent[]>
         styles: getKeyStyles(first, styleProps),
         variantGroups: detectVariants(elements, variantProps),
       });
-    }
+    };
 
     // ── Buttons ──
     const buttons: Element[] = [];

@@ -5,16 +5,16 @@ export async function extractTokens(page: Page): Promise<DesignTokens> {
   return page.evaluate(() => {
     // ── Helpers ───────────────────────────────────────────────────
 
-    function rgbToHex(r: number, g: number, b: number): string {
+    const rgbToHex = (r: number, g: number, b: number): string => {
       return (
         '#' +
         [r, g, b]
           .map((c) => Math.round(c).toString(16).padStart(2, '0'))
           .join('')
       );
-    }
+    };
 
-    function parseColor(raw: string): string | null {
+    const parseColor = (raw: string): string | null => {
       if (!raw || raw === 'transparent' || raw === 'rgba(0, 0, 0, 0)') return null;
 
       // rgb(r, g, b) or rgba(r, g, b, a)
@@ -37,9 +37,9 @@ export async function extractTokens(page: Page): Promise<DesignTokens> {
       }
 
       return null;
-    }
+    };
 
-    function parsePxValue(raw: string): number {
+    const parsePxValue = (raw: string): number => {
       if (!raw || raw === 'normal' || raw === 'auto' || raw === 'none') return 0;
       const match = raw.match(/([\d.]+)\s*px/);
       if (match) return parseFloat(match[1]);
@@ -50,9 +50,9 @@ export async function extractTokens(page: Page): Promise<DesignTokens> {
       if (emMatch) return parseFloat(emMatch[1]) * 16;
       const num = parseFloat(raw);
       return isNaN(num) ? 0 : num;
-    }
+    };
 
-    function extractColorsFromShadow(shadow: string): string[] {
+    const extractColorsFromShadow = (shadow: string): string[] => {
       const colors: string[] = [];
       const rgbaRe = /rgba?\(\s*\d+\s*,\s*\d+\s*,\s*\d+(?:\s*,\s*[\d.]+)?\s*\)/g;
       let m: RegExpExecArray | null;
@@ -61,7 +61,7 @@ export async function extractTokens(page: Page): Promise<DesignTokens> {
         if (hex) colors.push(hex);
       }
       return colors;
-    }
+    };
 
     // ── Collection maps ──────────────────────────────────────────
 
@@ -84,7 +84,7 @@ export async function extractTokens(page: Page): Promise<DesignTokens> {
     const radiusMap = new Map<string, { normalizedPx: number; occurrences: number }>();
     const zIndexMap = new Map<number, number>();
 
-    function addColor(hex: string, property: string) {
+    const addColor = (hex: string, property: string) => {
       const entry = colorMap.get(hex);
       if (entry) {
         entry.occurrences++;
@@ -92,9 +92,9 @@ export async function extractTokens(page: Page): Promise<DesignTokens> {
       } else {
         colorMap.set(hex, { occurrences: 1, properties: new Set([property]) });
       }
-    }
+    };
 
-    function addSpacing(value: string, normalizedPx: number, property: string) {
+    const addSpacing = (value: string, normalizedPx: number, property: string) => {
       if (normalizedPx === 0) return;
       const key = `${normalizedPx}px`;
       const entry = spacingMap.get(key);
@@ -104,7 +104,7 @@ export async function extractTokens(page: Page): Promise<DesignTokens> {
       } else {
         spacingMap.set(key, { normalizedPx, occurrences: 1, properties: new Set([property]) });
       }
-    }
+    };
 
     // ── Iterate all elements ─────────────────────────────────────
 

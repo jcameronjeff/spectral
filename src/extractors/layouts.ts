@@ -18,27 +18,27 @@ export async function analyzeLayouts(
       { type: 'grid' | 'flex' | 'block' | 'float' | 'position'; properties: Record<string, string>; children: number; count: number }
     >();
 
-    function getSelector(el: Element): string {
+    const getSelector = (el: Element): string => {
       if (el.id) return `#${el.id}`;
       const classes = Array.from(el.classList).filter(c => c.length > 0);
       const tag = el.tagName.toLowerCase();
       if (classes.length > 0) return `${tag}.${classes.join('.')}`;
       return tag;
-    }
+    };
 
-    function getLayoutType(cs: CSSStyleDeclaration): 'grid' | 'flex' | 'block' | 'float' | 'position' | null {
+    const getLayoutType = (cs: CSSStyleDeclaration): 'grid' | 'flex' | 'block' | 'float' | 'position' | null => {
       const display = cs.display;
       if (display === 'grid' || display === 'inline-grid') return 'grid';
       if (display === 'flex' || display === 'inline-flex') return 'flex';
       if (cs.cssFloat !== 'none') return 'float';
       if (cs.position === 'absolute' || cs.position === 'fixed') return 'position';
       return null;
-    }
+    };
 
-    function getLayoutProperties(
+    const getLayoutProperties = (
       cs: CSSStyleDeclaration,
       type: 'grid' | 'flex' | 'block' | 'float' | 'position',
-    ): Record<string, string> {
+    ): Record<string, string> => {
       const props: Record<string, string> = { display: cs.display };
 
       if (type === 'flex') {
@@ -70,7 +70,7 @@ export async function analyzeLayouts(
         }
       }
       return filtered;
-    }
+    };
 
     // Find all flex/grid containers
     const structuralTags = new Set([
@@ -137,7 +137,7 @@ export async function analyzeLayouts(
     }
 
     // Build simplified DOM tree
-    function buildTree(el: Element, depth: number): typeof treeNode | null {
+    const buildTree = (el: Element, depth: number): any => {
       if (depth > MAX_DEPTH) return null;
 
       const tag = el.tagName.toLowerCase();
@@ -166,7 +166,7 @@ export async function analyzeLayouts(
       }
 
       return treeNode;
-    }
+    };
 
     // Start from body
     const body = document.body;

@@ -19,8 +19,13 @@ export async function analyze(config: SpectralConfig): Promise<SpectralReport> {
   try {
     // 2. Navigate to main URL and extract tokens, components, layouts
     const page = await createPage(browser, config.timeout);
-    await page.goto(config.url, { waitUntil: 'networkidle' });
-    await waitForPage(page);
+    try {
+      await page.goto(config.url, { waitUntil: 'networkidle' });
+    } catch {
+      // Retry with less strict wait
+      await page.goto(config.url, { waitUntil: 'domcontentloaded' });
+      await page.waitForTimeout(3000);
+    }
 
     const tokens = await extractTokens(page);
     const mainComponents = await detectComponents(page);
